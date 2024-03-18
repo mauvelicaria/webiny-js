@@ -34,6 +34,7 @@ import { PageEditorConfig } from "./config/PageEditorConfig";
 import elementVariableRendererPlugins from "~/editor/plugins/elementVariables";
 import { useNavigatePage } from "~/admin/hooks/useNavigatePage";
 import { usePageBlocks } from "~/admin/contexts/AdminPageBuilder/PageBlocks/usePageBlocks";
+import { TranslationsPageEditorConfig } from "~/translations/PageEditorConfig";
 
 interface PageDataAndRevisionsState {
     page: PageWithContent | null;
@@ -170,6 +171,7 @@ export const PageEditor = () => {
         <React.Suspense fallback={<EditorLoadingScreen />}>
             <PageProvider page={page as Page}>
                 <PageEditorConfig />
+                <TranslationsPageEditorConfig />
                 <LoadData>
                     <PbEditor stateInitializerFactory={createStateInitializer(page!, revisions)} />
                 </LoadData>

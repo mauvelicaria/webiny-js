@@ -4,16 +4,18 @@ import { Renderer, Element } from "~/types";
 import { Theme, StylesObject } from "@webiny/theme/types";
 import { RendererProvider } from "~/contexts/Renderer";
 import { CSSObject, ClassNames } from "@emotion/react";
+import { ElementAttribute } from "~/attributes/ElementAttribute";
 
 interface GetStylesParams {
     theme: Theme;
     element: Element;
 }
 
-export type CreateRendererOptions<TRenderComponentProps> = Partial<{
+export type CreateRendererOptions<TRenderComponentProps, TAttributes> = Partial<{
     propsAreEqual: (prevProps: TRenderComponentProps, nextProps: TRenderComponentProps) => boolean;
     themeStyles: StylesObject | ((params: GetStylesParams) => StylesObject);
     baseStyles: StylesObject | ((params: GetStylesParams) => StylesObject);
+    attributes: TAttributes;
 }>;
 
 const DEFAULT_RENDERER_STYLES: StylesObject = {
@@ -23,10 +25,17 @@ const DEFAULT_RENDERER_STYLES: StylesObject = {
     boxSizing: "border-box"
 };
 
-export function createRenderer<TRenderComponentProps = Record<string, any>>(
+type GetInputs<T> = {
+    inputs?: { [K in keyof T]?: T[K] extends ElementAttribute<infer P> ? P : never };
+};
+
+export function createRenderer<
+    TRenderComponentProps = Record<string, any>,
+    TAttributes = Record<string, ElementAttribute>
+>(
     RendererComponent: React.ComponentType<TRenderComponentProps>,
-    options: CreateRendererOptions<TRenderComponentProps> = {}
-): Renderer<TRenderComponentProps> {
+    options: CreateRendererOptions<TRenderComponentProps, TAttributes> = {}
+): Renderer<TRenderComponentProps & GetInputs<TAttributes>> {
     return function Renderer(props) {
         const {
             getElementStyles,

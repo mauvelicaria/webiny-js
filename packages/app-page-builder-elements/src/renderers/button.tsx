@@ -1,11 +1,12 @@
 import React, { useMemo } from "react";
 import { usePageElements } from "~/hooks/usePageElements";
-import { LinkComponent } from "~/types";
+import { LinkComponent, Element } from "~/types";
 import styled, { CSSObject } from "@emotion/styled";
 import { ClassNames } from "@emotion/react";
 import { DefaultLinkComponent } from "~/renderers/components";
 import { createRenderer } from "~/createRenderer";
 import { useRenderer } from "~/hooks/useRenderer";
+import { ElementAttribute } from "~/attributes/ElementAttribute";
 
 const ICON_POSITION_FLEX_DIRECTION: Record<string, CSSObject> = {
     right: { flexDirection: "row-reverse" },
@@ -101,10 +102,48 @@ export interface Props {
     action?: ButtonElementData["action"];
 }
 
+const isButtonElement = (element: Element): element is Element<ButtonElementData> => {
+    return "buttonText" in element.data;
+};
+
+export const getValueFromElement = (element: Element) => {
+    if (isButtonElement(element)) {
+        return element.data.buttonText;
+    }
+    return null;
+};
+
+const attributes = {
+    buttonText: new ElementAttribute<string>({
+        name: "buttonText",
+        type: "text",
+        getValue: (element: Element<ButtonElementData>) => {
+            return element.data.buttonText;
+        }
+    }),
+    link: new ElementAttribute<string>({
+        name: "link",
+        type: "text",
+        getValue: (element: Element<ButtonElementData>) => {
+            return element.data.action.href;
+        }
+    }),
+    newTab: new ElementAttribute<boolean>({
+        name: "newTab",
+        type: "boolean",
+        getValue: (element: Element<ButtonElementData>) => {
+            return element.data.action.newTab;
+        }
+    })
+};
+
+// TODO: add `getAttributes` to `useRenderer()` which decides which value to use, and returns
+// the attributes map with values. The job of the renderer is to pass these values where needed.
+
 export const createButton = (params: CreateButtonParams = {}) => {
     const LinkComponent = params?.linkComponent || DefaultLinkComponent;
 
-    return createRenderer<Props>(
+    const Renderer = createRenderer<Props, typeof attributes>(
         props => {
             const { getStyles } = usePageElements();
             const { getElement } = useRenderer();
@@ -215,7 +254,10 @@ export const createButton = (params: CreateButtonParams = {}) => {
                     prevProps.buttonText === nextProps.buttonText &&
                     prevProps.action === nextProps.action
                 );
-            }
+            },
+            attributes
         }
     );
+
+    return Renderer;
 };
