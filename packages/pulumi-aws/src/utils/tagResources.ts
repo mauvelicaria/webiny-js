@@ -190,6 +190,7 @@ const taggableResourceTypes = new Set([
     "aws:neptune/eventSubscription:EventSubscription",
     "aws:neptune/parameterGroup:ParameterGroup",
     "aws:neptune/subnetGroup:SubnetGroup",
+    "aws:opensearchservice/domain:Domain",
     "aws:opsworks/stack:Stack",
     "aws:organizations/account:Account",
     "aws:pinpoint/app:App",
